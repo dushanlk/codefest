@@ -11,40 +11,23 @@ int btKeyPin = 11;
 void setup() {
   //Initializing LCD display
   initializeLcd();
-  
-  
-  //===Initializing bluetooth module
+    
+  //Initializing bluetooth module
+  initializeBtDevice();
    
 }
 
 void loop() {
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  //=lcd.clear();
-  //=lcd.print("404 Bluetooth");
-  //=delay(2000);
-  //=lcd.clear();
-  //=lcd.print("404 Resend");
-  //=delay(2000);
-  //Check whether AT mode is on
-  
-  
-  
-  printLcd("Checking AT mode");
-  if(BTSerial.available()){
-    printLcd("Serial available");
-    BTSerial.write("AT");
-  } else {
-    printLcd("No serial");
+  // Keep reading from HC-05 and send to Arduino Serial Monitor
+  if (BTSerial.available()){
+    Serial.write(BTSerial.read());
   }
-  delay(5000);
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  lcd.print(millis()/1000);
-}
+    
 
-int checkAtMode(){
-  
+  // Keep reading from Arduino Serial Monitor and send to HC-05
+  if (Serial.available()){
+    BTSerial.write(Serial.read());
+  }
 }
 
 void printLcd(String text){
@@ -59,10 +42,11 @@ void initializeLcd(){
   // set up the LCD's number of columns and rows: 
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("- Welcome to 404 -");
+  lcd.print(" Welcome to 404 ");
 }
 
 void initializeBtDevice(){
+  printLcd("   Starting..   ");
   pinMode(btKeyPin, OUTPUT);  // this pin will pull the HC-05 pin 34 (key pin) HIGH to switch module to AT mode
   digitalWrite(btKeyPin, HIGH);
   Serial.begin(9600);
@@ -70,5 +54,7 @@ void initializeBtDevice(){
   delay(10000);
   //power on bluetooth module
   pinMode(btVPin, OUTPUT);
-  digitalWrite(btVPin, HIGH); 
+  digitalWrite(btVPin, HIGH);  
+  delay(10);
+  printLcd("    Started!    ");
 }
